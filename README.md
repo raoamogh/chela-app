@@ -1,4 +1,4 @@
-# Chela 🧠✨
+# Chela
 
 **Chela** is a next-generation, AI-powered productivity tool designed to be the ultimate academic strategist for college students. It moves beyond simple calendars and to-do lists, providing an intelligent, dynamic, and persistent dashboard to help students manage their complex academic and personal lives.
 
@@ -52,7 +52,7 @@ To get a local copy up and running, follow these simple steps.
 
 1.  **Clone the repo:**
     ```bash
-    git clone [https://github.com/YOUR_USERNAME/chela.git](https://github.com/YOUR_USERNAME/chela.git)
+    git clone [https://github.com/raoamogh/chela.git](https://github.com/raoamogh/chela.git)
     ```
 2.  **Backend Setup:**
     ```bash
@@ -83,8 +83,8 @@ The core MVP is complete. Future development will focus on the AI features:
 ---
 ## 👤 Author
 
-**Helios**
-* GitHub: [@your_github_username](https://github.com/your_github_username)
-* LinkedIn: [Your LinkedIn Profile](https://linkedin.com/in/your_linkedin_profile)
+**Amogh Rao**
+* GitHub: [@raoamogh](https://github.com/raoamogh)
+* LinkedIn: [Amogh Rao](https://linkedin.com/in/raoamogha)
 
 Feel free to reach out with any questions or suggestions!
