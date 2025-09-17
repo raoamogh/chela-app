@@ -48,7 +48,7 @@ class DashboardScreen extends ConsumerWidget {
                   scheduleAsyncValue.when(
                     data: (schedule) => _buildScheduleList(context, schedule, ref),
                     error: (err, stack) => Center(child: Padding(padding: const EdgeInsets.all(40.0), child: Text("Error loading schedule.", style: TextStyle(color: Colors.redAccent)))),
-                    loading: () => const Center(child: Padding(padding: const EdgeInsets.all(40.0), child: CircularProgressIndicator())),
+                    loading: () => const Center(child: Padding(padding: EdgeInsets.all(40.0), child: CircularProgressIndicator())),
                   ),
                 ],
               ),

@@ -1,4 +1,4 @@
-import 'package:chela/screens/dashboard_screen.dart';
+import './screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
 import 'package:firebase_core/firebase_core.dart';
@@ -33,7 +33,7 @@ class ChelaApp extends StatelessWidget {
           primary: Color(0xFF03E1FF), // Electric Blue
         ),
       ),
-      home: const DashboardScreen(),
+      home: const AuthScreen(),
     );
   }
 }
