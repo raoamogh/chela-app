@@ -1,3 +1,5 @@
+import 'package:chela/screens/landing_screen.dart';
+
 import './screens/auth_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart'; // Import Riverpod
@@ -33,7 +35,7 @@ class ChelaApp extends StatelessWidget {
           primary: Color(0xFF03E1FF), // Electric Blue
         ),
       ),
-      home: const AuthScreen(),
+      home: const LandingScreen(),
     );
   }
 }
