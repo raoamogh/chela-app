@@ -43,3 +43,38 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Flutter/Dart specific
+/frontend/build/
+/frontend/.dart_tool/
+/frontend/.flutter-plugins
+/frontend/.flutter-plugins-dependencies
+/frontend/.pub-cache/
+/frontend/.pub/
+/frontend/ios/Pods/
+/frontend/ios/Podfile.lock
+/frontend/ios/.symlinks/
+/frontend/ios/Flutter/App.framework
+/frontend/ios/Flutter/engine.xcframework
+/frontend/ios/Flutter/flutter_assets/
+/frontend/ios/Runner.xcworkspace/
+
+# Python specific
+/backend/venv/
+/backend/__pycache__/
+/backend/*.pyc
+
+# Secret Keys & Credentials (CRITICAL)
+# This will ignore your Firebase key file anywhere in the project
+**/serviceAccountKey.json
+
+# IDE / Editor specific
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS specific
+.DS_Store
+Thumbs.db

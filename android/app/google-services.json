@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "600402774838",
+    "project_id": "chela-prod",
+    "storage_bucket": "chela-prod.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:600402774838:android:13f23205cf64f2e50c8197",
+        "android_client_info": {
+          "package_name": "com.example.chela"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZMTfsg7tvrhKCFPOr4-SM8o1tbVYW3cM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
