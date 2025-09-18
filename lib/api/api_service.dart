@@ -7,7 +7,7 @@ import '../models/user_profile_model.dart';
 
 class ApiService {
   // IMPORTANT: Replace this with your computer's actual local IP address
-  static const String _baseUrl = 'http://10.51.15.60:8000'; // Example IP
+  static const String _baseUrl = 'http://10.116.223.152:8000'; // Example IP
 
   // --- USER PROFILE METHODS ---
 

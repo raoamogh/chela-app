@@ -1,10 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:image_picker/image_picker.dart'; // <<< Official Image Picker
+import 'package:cloudinary_public/cloudinary_public.dart';
+import 'dart:io';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Your existing imports
 import '../providers/profile_provider.dart';
 import '../models/user_profile_model.dart';
+import '../api/api_service.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -14,20 +20,35 @@ class ProfileScreen extends ConsumerStatefulWidget {
 }
 
 class _ProfileScreenState extends ConsumerState<ProfileScreen> {
-  final _nameController = TextEditingController();
-  final _collegeController = TextEditingController();
-  final _courseController = TextEditingController();
-  final _codechefController = TextEditingController();
-  final _leetcodeController = TextEditingController();
+  final User? currentUser = FirebaseAuth.instance.currentUser;
   
-  // This flag prevents the controllers from being reset on every rebuild
+  File? _pickedImage;
+  bool _isUploadingImage = false;
+
+  late final TextEditingController _nameController;
+  late final TextEditingController _collegeController;
+  late final TextEditingController _courseController;
+  late final TextEditingController _codechefController;
+  late final TextEditingController _leetcodeController;
+
   bool _controllersInitialized = false;
-  
   late final List<TextEditingController> _controllers;
+
+  // --- IMPORTANT: PASTE YOUR CLOUDINARY CREDENTIALS HERE ---
+  static const String _cloudinaryCloudName = 'dqhzvd3u9';
+  static const String _cloudinaryApiKey = '916246345417713';
+  static const String _cloudinaryApiSecret = '_FS9a0I1OIFoR7aGxTCSon89xlY'; 
+  static const String _uploadPreset = 'chela_profile_pics'; 
 
   @override
   void initState() {
     super.initState();
+    _nameController = TextEditingController();
+    _collegeController = TextEditingController();
+    _courseController = TextEditingController();
+    _codechefController = TextEditingController();
+    _leetcodeController = TextEditingController();
+
     _controllers = [
       _nameController, _collegeController, _courseController,
       _codechefController, _leetcodeController,
@@ -44,29 +65,95 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
     super.dispose();
   }
-  
+
   double _profileCompletion = 0.0;
   void _updateProgress() {
+    if (!mounted) return;
     int completedFields = 0;
     for (var controller in _controllers) {
       if (controller.text.trim().isNotEmpty) {
         completedFields++;
       }
     }
-    if (mounted) {
-      setState(() {
-        _profileCompletion = completedFields / _controllers.length;
-      });
-    }
+    setState(() {
+      _profileCompletion = completedFields / _controllers.length;
+    });
   }
 
-  // This function populates the text fields when the data is first loaded
   void _updateControllers(UserProfile profile) {
     _nameController.text = profile.name;
     _collegeController.text = profile.college;
     _courseController.text = profile.course;
     _codechefController.text = profile.codechefUsername;
     _leetcodeController.text = profile.leetcodeUsername;
+    _updateProgress(); 
+  }
+
+  // --- UPDATED: Image Picking Logic using official image_picker ---
+  Future<void> _pickAndUploadImage() async {
+    final picker = ImagePicker();
+    final pickedImageFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 70, // Compress the image to save space
+      maxWidth: 300,   // Resize the image for profile pictures
+    );
+
+    if (pickedImageFile != null) {
+      final File imageFile = File(pickedImageFile.path);
+      setState(() {
+        _pickedImage = imageFile;
+        _isUploadingImage = true; // Start loading indicator
+      });
+
+      try {
+        final String? imageUrl = await _uploadImageToCloudinary(imageFile);
+        if (imageUrl != null) {
+          await currentUser?.updatePhotoURL(imageUrl); 
+          await ref.read(profileProvider.notifier).updateProfile({"photoURL": imageUrl}); 
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Profile picture updated!")),
+            );
+          }
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text("Failed to upload image to Cloudinary.")),
+            );
+          }
+        }
+      } catch (e) {
+        print("Error uploading image to Cloudinary: $e");
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error uploading image: ${e.toString()}")),
+          );
+        }
+      } finally {
+        setState(() {
+          _isUploadingImage = false; // Stop loading indicator
+        });
+      }
+    }
+  }
+
+  Future<String?> _uploadImageToCloudinary(File imageFile) async {
+    //
+
+    try {
+      final cloudinary = CloudinaryPublic(_cloudinaryCloudName, _uploadPreset, cache: false);
+      final response = await cloudinary.uploadFile(
+        CloudinaryFile.fromFile(imageFile.path, resourceType: CloudinaryResourceType.Image),
+      );
+      return response.secureUrl;
+    } on CloudinaryException catch (e) {
+      print("Cloudinary error: ${e.message} - ${e.request}");
+      return null;
+    } catch (e) {
+      print("Unknown upload error: $e");
+      return null;
+    }
   }
 
   Future<void> _saveProfile() async {
@@ -107,8 +194,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       ),
       body: profileState.when(
         data: (profile) {
-          // --- THE FIX ---
-          // We only update the text fields if they haven't been initialized yet.
           if (!_controllersInitialized) {
             _updateControllers(profile);
             _controllersInitialized = true;
@@ -163,15 +248,24 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             CircleAvatar(
               radius: 60,
               backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
-              backgroundImage: currentUser?.photoURL != null ? NetworkImage(currentUser!.photoURL!) : null,
-              child: currentUser?.photoURL == null 
+              // Show the picked image preview or current user photoURL
+              backgroundImage: _pickedImage != null
+                  ? FileImage(_pickedImage!) as ImageProvider
+                  : (currentUser?.photoURL != null ? NetworkImage(currentUser!.photoURL!) : null),
+              child: _pickedImage == null && currentUser?.photoURL == null 
                 ? Icon(Icons.person_rounded, size: 60, color: Theme.of(context).colorScheme.primary) 
                 : null,
             ),
+            if (_isUploadingImage)
+              const Positioned.fill(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
             Positioned(
               bottom: 0, right: 0,
               child: GestureDetector(
-                onTap: () { /* TODO: Implement image picking */ },
+                onTap: _pickAndUploadImage,
                 child: Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(color: Theme.of(context).scaffoldBackgroundColor, shape: BoxShape.circle, border: Border.all(color: Colors.white24)),

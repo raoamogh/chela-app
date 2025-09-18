@@ -49,6 +49,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   simple_animations: ^5.0.2
   google_fonts: ^6.2.1
+  cloudinary_public: ^0.23.1
 
 dev_dependencies:
   flutter_test:
