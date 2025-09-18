@@ -50,10 +50,16 @@ dependencies:
   simple_animations: ^5.0.2
   google_fonts: ^6.2.1
   cloudinary_public: ^0.23.1
+  cloud_firestore: ^4.17.5
+  intl: ^0.20.2
+  flutter_local_notifications: ^17.1.2 # Use the latest version
+  timezone: ^0.9.2 # Required for scheduling notifications in specific timezones# Helps get the device's current timezone
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  riverpod_generator: ^2.4.0 # Add this line
+  build_runner: ^2.4.14
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

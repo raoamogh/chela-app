@@ -14,12 +14,13 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     defaultConfig {
@@ -44,4 +45,17 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies { 
+
+    // THIS IS THE CRUCIAL LINE FOR DESUGARING
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+
+    // If you have any other dependencies like Firebase SDKs (e.g., firebase-bom, firebase-analytics-ktx, etc.)
+    // they would also go in here, for example:
+    // implementation(platform("com.google.firebase:firebase-bom:32.3.1"))
+    // implementation("com.google.firebase:firebase-analytics-ktx")
+    // implementation("com.google.firebase:firebase-auth-ktx")
+    // implementation("com.google.firebase:firebase-firestore-ktx")
 }

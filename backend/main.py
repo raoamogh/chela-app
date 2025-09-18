@@ -43,6 +43,21 @@ class CreateScheduledEvent(BaseModel):
     color: str
     location: str
 
+class Assignment(BaseModel):
+    id: str
+    subjectName: str
+    title: str
+    dueDate: str # We'll store this as an ISO 8601 string, e.g., "2025-09-25T18:30:00"
+    isCompleted: bool
+    priority: int # e.g., 1 (Low), 2 (Medium), 3 (High)
+
+class CreateAssignment(BaseModel):
+    subjectName: str
+    title: str
+    dueDate: str
+    priority: int
+
+
 
 # --- API Endpoints ---
 @app.get("/")
@@ -134,5 +149,40 @@ def undo_complete_schedule_event(user_id: str, event_id: str):
         event_ref = db.collection('users').document(user_id).collection('schedule').document(event_id)
         event_ref.update({"isCompleted": False})
         return {"message": f"Undo completion for event {event_id}."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/assignments/{user_id}", response_model=List[Assignment])
+def get_user_assignments(user_id: str):
+    """Fetches all assignments for a given user."""
+    try:
+        assignments_ref = db.collection('users').document(user_id).collection('assignments')
+        docs = assignments_ref.stream()
+        return [doc.to_dict() for doc in docs]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/assignments/{user_id}", response_model=Assignment)
+def add_assignment(user_id: str, assignment: CreateAssignment):
+    """Adds a new assignment for a user."""
+    try:
+        assignments_ref = db.collection('users').document(user_id).collection('assignments')
+        new_assignment_id = str(uuid.uuid4())
+        
+        full_assignment_data = assignment.dict()
+        full_assignment_data['id'] = new_assignment_id
+        full_assignment_data['isCompleted'] = False
+        
+        assignments_ref.document(new_assignment_id).set(full_assignment_data)
+        return full_assignment_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/assignments/{user_id}/{assignment_id}")
+def delete_assignment(user_id: str, assignment_id: str):
+    """Deletes an assignment for a user."""
+    try:
+        db.collection('users').document(user_id).collection('assignments').document(assignment_id).delete()
+        return {"message": "Assignment deleted successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
